@@ -1,9 +1,5 @@
 package com.dojo.number;
 
-import com.dojo.number.exception.BadLuckException;
-import com.dojo.number.exception.OddException;
-import com.dojo.number.exception.TheDevilException;
-import com.dojo.number.exception.TooLowException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,7 +33,7 @@ class NumberControllerTest {
         // Given
         final int inputNumber = 32;
         final int outputNumber = 42;
-        when(numberService.doTheMagic(inputNumber)).thenReturn(outputNumber);
+        when(numberService.doTheMagic(inputNumber)).thenReturn(new NumericResult(outputNumber));
 
         // When
         int result = numberController.doTheMagic(inputNumber);
@@ -49,10 +45,10 @@ class NumberControllerTest {
 
     @ParameterizedTest
     @MethodSource("exceptionsAndExpectedLogs")
-    void logs_exceptions_raised_by_the_service_and_close_the_service(Exception exception, String expectedLoggedMessage) throws Exception {
+    void logs_exceptions_raised_by_the_service_and_close_the_service(MagicResult result, String expectedLoggedMessage) throws Exception {
         // Given
         final int inputNumber = 72;
-        when(numberService.doTheMagic(inputNumber)).thenThrow(exception);
+        when(numberService.doTheMagic(inputNumber)).thenReturn(result);
 
         // When
         numberController.doTheMagic(inputNumber);
@@ -64,11 +60,12 @@ class NumberControllerTest {
 
     static Stream<Arguments> exceptionsAndExpectedLogs() {
         return Stream.of(
-                arguments(new TheDevilException("Devil exception"), "The devil's message: Devil exception"),
-                arguments(new BadLuckException("Bad luck exception"), "Bad luck message: Bad luck exception"),
-                arguments(new TooLowException("Too low exception"), "Too low: Too low exception"),
-                arguments(new OddException("Odd exception"), "Weird case: Odd exception"),
-                arguments(new RuntimeException("Run time exception"), "Just in case: Run time exception")
+                arguments(new DevilResult("Devil exception"), "The devil's message: Devil exception"),
+                arguments(new BadLuckResult("Bad luck exception"), "Bad luck message: Bad luck exception"),
+                arguments(new TooLowResult("Too low exception"), "Too low: Too low exception"),
+                arguments(new OddResult("Odd exception"), "Weird case: Odd exception"),
+                arguments(new NegativeResult("Run time exception"), "Just in case: Run time exception"),
+                arguments(new GiveMeFiveResult(), "double dispatch pan pan")
         );
     }
 }

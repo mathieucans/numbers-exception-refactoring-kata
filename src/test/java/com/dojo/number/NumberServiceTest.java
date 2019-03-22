@@ -1,9 +1,5 @@
 package com.dojo.number;
 
-import com.dojo.number.exception.BadLuckException;
-import com.dojo.number.exception.OddException;
-import com.dojo.number.exception.TheDevilException;
-import com.dojo.number.exception.TooLowException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,7 +8,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 
 class NumberServiceTest {
@@ -20,24 +15,25 @@ class NumberServiceTest {
     private NumberService numberService = new NumberService();
 
     @Test
-    void throws_a_devil_exception_for_666() {
-        assertThatExceptionOfType(TheDevilException.class)
-                .isThrownBy(() -> numberService.doTheMagic(666));
+    void returns_a_devil_result_for_666() {
+        assertThat(numberService.doTheMagic(666)).isEqualTo(new DevilResult("The devil exception"));
     }
 
     @Test
-    void throws_a_bad_luck_exception_for_13() {
-        assertThatExceptionOfType(BadLuckException.class)
-                .isThrownBy(() -> numberService.doTheMagic(13));
+    void returns_a_bad_luck_result_for_13(){
+        assertThat(numberService.doTheMagic(13)).isEqualTo(new BadLuckResult("That's not my lucky number"));
+    }
+
+    @Test
+    void give_me_five() {
+        assertThat(numberService.doTheMagic(5)).isInstanceOf(GiveMeFiveResult.class);
 
     }
 
     @ParameterizedTest
     @MethodSource("numbersBetween10And20Except13")
-    void throws_a_too_low_exception_for_numbers_between_10_and_20_except_13(int number) {
-        assertThatExceptionOfType(TooLowException.class)
-                .isThrownBy(() -> numberService.doTheMagic(number));
-
+    void returns_too_low_result_for_numbers_between_10_and_20_except_13(int number){
+        assertThat(numberService.doTheMagic(number)).isEqualTo(new TooLowResult("You can do better"));
     }
 
     static IntStream numbersBetween10And20Except13() {
@@ -46,8 +42,8 @@ class NumberServiceTest {
 
     @ParameterizedTest
     @MethodSource("evenNumbersBetween100And200")
-    void return_3_times_the_number_for_even_numbers_between_100_and_200(int number) throws Exception {
-        assertThat(numberService.doTheMagic(number)).isEqualTo(number * 3);
+    void return_3_times_the_number_for_even_numbers_between_100_and_200(int number) {
+        assertThat(numberService.doTheMagic(number)).isEqualTo(new NumericResult(number * 3));
     }
 
     static IntStream evenNumbersBetween100And200() {
@@ -57,9 +53,8 @@ class NumberServiceTest {
 
     @ParameterizedTest
     @MethodSource("oddNumbersBetween100And200")
-    void throws_an_odd_exception_for_odd_numbers_between_100_and_200(int number) {
-        assertThatExceptionOfType(OddException.class)
-                .isThrownBy(() -> numberService.doTheMagic(number));
+    void returns_an_odd_result_for_odd_numbers_between_100_and_200(int number) {
+        assertThat(numberService.doTheMagic(number)).isEqualTo(new OddResult("Hmm... no"));
     }
 
     static IntStream oddNumbersBetween100And200() {
@@ -68,14 +63,13 @@ class NumberServiceTest {
 
     @ParameterizedTest
     @ValueSource(ints = {-1, -2, -100, -21321})
-    void throws_a_runtime_exception_for_negative_numbers(int number) {
-        assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> numberService.doTheMagic(number));
+    void returns_negative_result_for_negative_numbers(int number) {
+        assertThat(numberService.doTheMagic(number)).isEqualTo(new NegativeResult("Should not happen"));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {2, 34, 453, 1000})
-    void return_2_times_the_number(int number) throws Exception {
-        assertThat(numberService.doTheMagic(number)).isEqualTo(number * 2);
+    void return_2_times_the_number(int number) {
+        assertThat(numberService.doTheMagic(number)).isEqualTo(new NumericResult(number * 2));
     }
 }
