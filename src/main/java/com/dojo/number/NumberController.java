@@ -11,12 +11,10 @@ public class NumberController {
     }
 
     public int doTheMagic(int number) {
-        MagicResult magicResult = numberService.doTheMagic(number);
+        DoTheMagicCollaborator collaborator = new DoTheMagicCollaborator(logger);
+        numberService.doTheMagic(number, collaborator);
         numberService.close();
 
-        DoTheMagicVisitor visitor = new DoTheMagicVisitor(logger);
-        magicResult.accept(visitor);
-
-        return visitor.getResult();
+        return collaborator.getResult();
     }
 }
